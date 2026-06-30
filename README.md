@@ -21,16 +21,16 @@ Pick one of the methods below.
 
 **macOS / Linux**
 ```bash
-git clone https://github.com/ai-2070/claude-skill-net.git /tmp/claude-skill-net
+git clone https://github.com/ai-2070/net-claude-skill.git /tmp/net-claude-skill
 mkdir -p ~/.claude/skills
-cp -R /tmp/claude-skill-net/net-event-bus ~/.claude/skills/
+cp -R /tmp/net-claude-skill/net-event-bus ~/.claude/skills/
 ```
 
 **Windows (PowerShell)**
 ```powershell
-git clone https://github.com/ai-2070/claude-skill-net.git $env:TEMP\claude-skill-net
+git clone https://github.com/ai-2070/net-claude-skill.git $env:TEMP\net-claude-skill
 New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\skills" | Out-Null
-Copy-Item -Recurse "$env:TEMP\claude-skill-net\net-event-bus" "$env:USERPROFILE\.claude\skills\"
+Copy-Item -Recurse "$env:TEMP\net-claude-skill\net-event-bus" "$env:USERPROFILE\.claude\skills\"
 ```
 
 You should end up with `~/.claude/skills/net-event-bus/SKILL.md`.
@@ -41,8 +41,8 @@ From the root of the repo where you want the skill available to your whole team:
 
 ```bash
 mkdir -p .claude/skills
-git clone https://github.com/ai-2070/claude-skill-net.git /tmp/claude-skill-net
-cp -R /tmp/claude-skill-net/net-event-bus .claude/skills/
+git clone https://github.com/ai-2070/net-claude-skill.git /tmp/net-claude-skill
+cp -R /tmp/net-claude-skill/net-event-bus .claude/skills/
 git add .claude/skills/net-event-bus && git commit -m "Add net-event-bus Claude skill"
 ```
 
@@ -51,8 +51,8 @@ git add .claude/skills/net-event-bus && git commit -m "Add net-event-bus Claude 
 Clone once, then symlink so `git pull` updates the installed skill:
 
 ```bash
-git clone https://github.com/ai-2070/claude-skill-net.git ~/src/claude-skill-net
-ln -s ~/src/claude-skill-net/net-event-bus ~/.claude/skills/net-event-bus
+git clone https://github.com/ai-2070/net-claude-skill.git ~/src/net-claude-skill
+ln -s ~/src/net-claude-skill/net-event-bus ~/.claude/skills/net-event-bus
 ```
 
 ---
@@ -101,7 +101,7 @@ The skill is progressive-disclosure: `SKILL.md` is the always-on entry point, an
 ## Updating
 
 - **Cloned/copied (Options A & B):** re-run the copy step, or `git pull` in the clone and copy again.
-- **Symlinked (Option C):** `git pull` in `~/src/claude-skill-net` — the installed skill tracks it automatically.
+- **Symlinked (Option C):** `git pull` in `~/src/net-claude-skill` — the installed skill tracks it automatically.
 
 ## Uninstall
 
