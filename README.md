@@ -116,3 +116,7 @@ rm -rf .claude/skills/net-event-bus        # project
 
 - **Net library & SDKs:** https://github.com/ai-2070/net
 - **Claude Code skills docs:** https://docs.anthropic.com/en/docs/claude-code/skills
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE).
