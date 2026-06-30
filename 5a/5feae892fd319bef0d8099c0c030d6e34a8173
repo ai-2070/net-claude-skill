@@ -1,0 +1,19 @@
+LICENSE
+  s_1e2ccecffa26eb::t_0cc035d83092c7 1-201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "5a5feae892fd319bef0d8099c0c030d6e34a8173",
+  "prompts": {},
+  "sessions": {
+    "s_1e2ccecffa26eb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "124be560-98bd-4f8d-b2d9-dcf5f26fce8a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "LZL0 <12474488+LZL0@users.noreply.github.com>"
+    }
+  }
+}
