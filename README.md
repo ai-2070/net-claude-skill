@@ -92,6 +92,9 @@ The skill is progressive-disclosure: `SKILL.md` is the always-on entry point, an
 | `runtime.md` | Shutdown contract, error handling, async-runtime integration. |
 | `observability.md` | Catching silent drops; Prometheus/OTel wiring. |
 | `payloads.md` | Event schema, size limits, cross-language interop traps. |
+| `filter-dsl.md` | Consumer-side content filtering — equality `$and`/`$or`/`$not` predicates on the bus. |
+| `error-codes.md` | Classifying a specific error variant — the full core-crate + subsystem taxonomy. |
+| `cli.md` | The `net-mesh` CLI — `transfer` (blob/dir) and `typegen` commands, exit codes. |
 | `testing.md` | Fixtures, race conditions, CI gotchas. |
 | `gotchas.md` | Migrating from Kafka / NATS / Redis Streams / Pulsar. |
 | `event-semantics.md` | Naming events / what an event may assert — a fact observed at one layer, not an end-to-end `200 OK`. |
