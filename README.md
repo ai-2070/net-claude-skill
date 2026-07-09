@@ -127,6 +127,7 @@ Both skills are progressive-disclosure: `SKILL.md` is the always-on entry point,
 | `networks.md` | Enabling a network — CAIP-2 / CAIP-19, the signed asset registry, the Base → Solana → xrpl "config, not code" ladder. |
 | `billing.md` | Usage records / a billing stream — `BillingLog` (subscribe/read/export), immutability, what billing is NOT. |
 | `http402.md` | A Net agent paying an external x402 HTTP API — the outbound `X402HttpFlow`, the header-only v2 transport. |
+| `failure-schematic.md` | Handling denials / refusals — the machine-actionable `net.payment.failure@1` verdict that rides beside the human error, the reason → recovery mapping, `funds_moved` vs `prior_payment`. |
 | `bindings.md` | Per-language support — only Rust + Python have a native flow; Node is read-only pricing; Go is absent. Python `CapabilityGateway`. |
 | `testing.md` | Cross-language golden vectors, the mock conformance suite, the key-invariant negative test, the env-gated live run. |
 | `gotchas.md` | Wrong mental model, migrating, or before merging — the review invariant, "what not to build," byte-preservation traps. |
