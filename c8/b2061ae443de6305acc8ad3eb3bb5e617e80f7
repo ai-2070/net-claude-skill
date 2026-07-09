@@ -1,0 +1,19 @@
+README.md
+  s_923d40eff90b08::t_09a1fc4220560d 130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c8b2061ae443de6305acc8ad3eb3bb5e617e80f7",
+  "prompts": {},
+  "sessions": {
+    "s_923d40eff90b08": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1448d3c8-fb51-48ea-b4b7-94a6c898c32d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "LZL0 <12474488+LZL0@users.noreply.github.com>"
+    }
+  }
+}
