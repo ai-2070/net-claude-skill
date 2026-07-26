@@ -2,7 +2,7 @@
 
 Two [Claude **Agent Skills**](https://docs.anthropic.com/en/docs/claude-code/skills) that teach Claude how to integrate the [**Net**](https://github.com/ai-2070/net) library (`@net-mesh/sdk`, Rust/Python `net-sdk`, the Go binding, and the C `net.h`):
 
-- **`net-event-bus`** — Net as an event bus: pub/sub over the mesh, nRPC request/response, the MCP bridge (`net wrap` / `net mcp serve`), the gang-claim scheduler, and the RedEX / CortEX / Dataforts persistence layers on top.
+- **`net-event-bus`** — Net as an event bus: pub/sub over the mesh, nRPC request/response, the MCP bridge (`net wrap` / `net mcp serve`), organization capability auth (`serve_org` / `mesh.org(..).call`), the gang-claim scheduler, and the RedEX / CortEX / Dataforts persistence layers on top.
 - **`net-payments`** — x402-native payments on the mesh: pricing a capability at discovery, signed quotes, the provider-side lifecycle engine (quote → verify → settle → bill), the caller-side pay-to-invoke flow, tiered on-chain verification, and spend policy.
 
 Net looks like Kafka/NATS/Redis Streams on the surface but has a fundamentally different model (no broker, hot subscribers, backpressure-as-silence, every node a peer). Net Payments looks like a dozen payment SDKs but is non-custodial and never moves money — it only signs the commercial facts around invocation. Out of the box, a coding agent will happily write integration code that **compiles, runs, and is wrong**. These skills load the right mental model and verified per-SDK templates so Claude generates correct Net code.
@@ -74,7 +74,7 @@ ln -s ~/src/net-claude-skill/net-payments ~/.claude/skills/net-payments
    >
    > *"Price a Net capability with x402 and charge callers to invoke it."*
 
-   Claude loads the matching skill automatically when your request matches — **net-event-bus** on imports of `@net-mesh/sdk` / `net-sdk` or phrases like *pub/sub with Net*, *nRPC*, *mesh RPC*, *RedEX*, *CortEX*, *Dataforts*, *gang scheduler*, *claim an island*, *net wrap / mcp serve*; **net-payments** on imports of `net-payments` / `net_payments` or phrases like *price a capability*, *pay to invoke*, *x402*, *settle on Base/Solana*, *spend limit*, …
+   Claude loads the matching skill automatically when your request matches — **net-event-bus** on imports of `@net-mesh/sdk` / `net-sdk` or phrases like *pub/sub with Net*, *nRPC*, *mesh RPC*, *RedEX*, *CortEX*, *Dataforts*, *gang scheduler*, *claim an island*, *net wrap / mcp serve*, *org capability*, *serve_org*, *tenant-private service*; **net-payments** on imports of `net-payments` / `net_payments` or phrases like *price a capability*, *pay to invoke*, *x402*, *settle on Base/Solana/XRPL*, *spend limit*, …
 
 ---
 
@@ -96,6 +96,7 @@ Both skills are progressive-disclosure: `SKILL.md` is the always-on entry point,
 | `streams.md` | Ordered point-to-point delivery with credit-grant backpressure. |
 | `nrpc.md` | Request/response — typed call → reply, deadlines, retries, hedging. |
 | `mcp.md` | The MCP bridge — `net wrap` a stdio server as mesh capabilities, or `net mcp serve` the mesh to a local host; pinning + credential forwarding. |
+| `org.md` | Organization capability auth — a service only authorized orgs can discover or call (invisible, not refused): `net-mesh org` offline issuance, `net node adopt`, `serve_org` / `mesh.org(..).call`. |
 | `redex.md` | Durable per-channel append-only logs (replay from offset, retention). |
 | `cortex.md` | Folded queryable state (SQLite-shaped queries, NetDB). |
 | `dataforts.md` | Greedy caching, data gravity, blob refs, read-your-writes. |
@@ -122,13 +123,13 @@ Both skills are progressive-disclosure: `SKILL.md` is the always-on entry point,
 | `caller.md` | Paying to invoke — `CallerPaymentFlow` over a `ProviderChannel`, spend check, the approval loop, the MCP gateway path. |
 | `facilitator.md` | Wiring the `verify` / `settle` boundary — the `Facilitator` trait, the mock, the real `HttpFacilitator`, config packs, auth. |
 | `verification.md` | Confidence — the `observed / confirmed(n) / final` tiers, the independent `ChainChecker`, reorg freeze, replay. |
-| `signer.md` | Settlement signing — the `SchemeSigner` seam, `ExternalSigner` / `ExternalSvmSigner`, EIP-3009 / SPL, the no-raw-signing invariant. |
+| `signer.md` | Settlement signing — the `SchemeSigner` seam, `ExternalSigner` / `ExternalSvmSigner` / `ExternalXrplSigner`, EIP-3009 / SPL / XRPL, the no-raw-signing invariant. |
 | `spend-policy.md` | Limits, budgets, approvals — `SpendPolicyEngine`, the fail-closed default posture, delegation inheritance. |
 | `networks.md` | Enabling a network — CAIP-2 / CAIP-19, the signed asset registry, the Base → Solana → xrpl "config, not code" ladder. |
 | `billing.md` | Usage records / a billing stream — `BillingLog` (subscribe/read/export), immutability, what billing is NOT. |
 | `http402.md` | A Net agent paying an external x402 HTTP API — the outbound `X402HttpFlow`, the header-only v2 transport. |
 | `failure-schematic.md` | Handling denials / refusals — the machine-actionable `net.payment.failure@1` verdict that rides beside the human error, the reason → recovery mapping, `funds_moved` vs `prior_payment`. |
-| `bindings.md` | Per-language support — only Rust + Python have a native flow; Node is read-only pricing; Go is absent. Python `CapabilityGateway`. |
+| `bindings.md` | Per-language support — Rust, Python, and Node all have a full demand+supply flow; Go is verifier-only. `CapabilityGateway` / `PaymentProvider`, Node's `close()` + `permissiveChannels` gotchas. |
 | `testing.md` | Cross-language golden vectors, the mock conformance suite, the key-invariant negative test, the env-gated live run. |
 | `gotchas.md` | Wrong mental model, migrating, or before merging — the review invariant, "what not to build," byte-preservation traps. |
 
