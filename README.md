@@ -139,3 +139,7 @@ Drop `-g` for project installs. If you installed by hand, `rm -rf ~/.claude/skil
 ## License
 
 Dual-licensed under [Apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT), at your option.
+
+---
+
+*The skills are authored in [`ai-2070/net`](https://github.com/ai-2070/net) under `.claude/skills/`, next to the code they describe, and published to this repo automatically. Send fixes there rather than to this mirror.*
