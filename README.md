@@ -24,11 +24,15 @@ Install both, or just the one you need. Pick one of the methods below.
 
 The [`skills` CLI](https://github.com/vercel-labs/skills) installs a skill straight from this repo — no clone, no copy step:
 
-```bash
-# Personal — both skills, available in every project on your machine
-npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code -g
+**Personal** — both skills, available in every project on your machine:
 
-# Project — checked in for your whole team (run from the repo root)
+```bash
+npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code -g
+```
+
+**Project** — checked in for your whole team (run from the repo root):
+
+```bash
 npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code
 ```
 
