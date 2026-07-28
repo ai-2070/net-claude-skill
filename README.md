@@ -12,23 +12,30 @@ Net looks like Kafka/NATS on the surface but has no broker. Net Payments looks l
 ## Install
 
 ```bash
-npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code -g
+npx skills add ai-2070/net-claude-skill -g
 ```
 
-Installs both skills to `~/.claude/skills/`, available in every project. Drop `-g` to install into the current project's `.claude/skills/` instead — checked in and shared with your team.
+The [`skills` CLI](https://github.com/vercel-labs/skills) detects which coding agents you have, asks which skills you want, and puts them where that agent looks — `~/.claude/skills/` for Claude Code, `~/.codex/skills/` for Codex. Drop `-g` for a project install instead (`.claude/skills/` or `.agents/skills/`), checked in and shared with your team.
 
-<details>
-<summary>Other options — one skill, other agents, manual install</summary>
-
-The [`skills` CLI](https://github.com/vercel-labs/skills) takes a few useful flags:
+To skip the prompts and say exactly what you want:
 
 ```bash
-npx skills add ai-2070/net-claude-skill                            # interactive picker
-npx skills add ai-2070/net-claude-skill --skill net-payments -g    # just one skill
-npx skills add ai-2070/net-claude-skill --skill '*' -a '*' -g      # every agent, not just Claude Code
+npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code -g   # Claude Code
+npx skills add ai-2070/net-claude-skill --skill '*' -a codex -g         # Codex
+npx skills add ai-2070/net-claude-skill --skill '*' -a '*' -g           # every agent it supports
 ```
 
-These are plain Agent Skills, so `-a '*'` also installs them for Codex, Cursor, Copilot, and friends. The CLI symlinks each agent's skills directory to one canonical copy, so `npx skills update` refreshes them all (pass `--copy` if symlinks aren't an option).
+<details>
+<summary>Other options — one skill, manual install</summary>
+
+These are plain Agent Skills, so `-a '*'` covers Cursor, Copilot, Cline, and the rest too. `--skill` picks individual skills:
+
+```bash
+npx skills add ai-2070/net-claude-skill --skill net-payments -g   # just one
+npx skills add ai-2070/net-claude-skill --list                    # see what's in the repo
+```
+
+The CLI symlinks each agent's skills directory to one canonical copy, so `npx skills update` refreshes them all at once (pass `--copy` if symlinks aren't an option).
 
 **Without the CLI:** a skill is just a directory containing a `SKILL.md`, so copying the folder in works too.
 
@@ -38,19 +45,19 @@ mkdir -p ~/.claude/skills
 cp -R /tmp/net-claude-skill/net-event-bus /tmp/net-claude-skill/net-payments ~/.claude/skills/
 ```
 
-Use `<your-repo>/.claude/skills/` instead for a project install. To hack on the skills locally, clone once and symlink the folders so `git pull` updates them in place.
+Swap in `~/.codex/skills/` for Codex, or `<your-repo>/.claude/skills/` for a project install. To hack on the skills locally, clone once and symlink the folders so `git pull` updates them in place.
 
 </details>
 
 ## Check it worked
 
-Restart Claude Code and run `/skills` — **net-event-bus** and **net-payments** should be listed. Then just ask for something Net-shaped:
+Restart your agent — in Claude Code, `/skills` lists **net-event-bus** and **net-payments**. Then just ask for something Net-shaped:
 
 > *"Wire up a Net publisher and subscriber over the mesh in TypeScript."*
 >
 > *"Price a Net capability with x402 and charge callers to invoke it."*
 
-Claude loads the matching skill on its own — you never have to name it.
+The matching skill loads on its own — you never have to name it.
 
 ## What's inside
 
