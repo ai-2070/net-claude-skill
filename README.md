@@ -1,107 +1,63 @@
 # net-claude-skill — Claude skills for the Net mesh
 
-Two [Claude **Agent Skills**](https://docs.anthropic.com/en/docs/claude-code/skills) that teach Claude how to integrate the [**Net**](https://github.com/ai-2070/net) library (`@net-mesh/sdk`, Rust/Python `net-sdk`, the Go binding, and the C `net.h`):
+Two [Agent Skills](https://docs.anthropic.com/en/docs/claude-code/skills) that teach Claude how to write correct [**Net**](https://github.com/ai-2070/net) integration code:
 
-- **`net-event-bus`** — Net as an event bus: pub/sub over the mesh, nRPC request/response, agent-to-agent task handoff (`serve_a2a` / `submit_task`), the MCP bridge (`net wrap` / `net mcp serve`), organization capability auth (`serve_org` / `mesh.org(..).call`), the gang-claim scheduler, and the RedEX / CortEX / Dataforts persistence layers on top.
-- **`net-payments`** — x402-native payments on the mesh: pricing a capability at discovery, signed quotes, the provider-side lifecycle engine (quote → verify → settle → bill), the caller-side pay-to-invoke flow, tiered on-chain verification, and spend policy.
+- **`net-event-bus`** — the mesh: pub/sub, nRPC request/response, agent-to-agent task handoff, the MCP bridge, org capability auth, the gang-claim scheduler, and the RedEX / CortEX / Dataforts layers on top.
+- **`net-payments`** — x402 payments on the mesh: price a capability, quote, verify, settle, bill, and spend policy.
 
-Net looks like Kafka/NATS/Redis Streams on the surface but has a fundamentally different model (no broker, hot subscribers, backpressure-as-silence, every node a peer). Net Payments looks like a dozen payment SDKs but is non-custodial and never moves money — it only signs the commercial facts around invocation. Out of the box, a coding agent will happily write integration code that **compiles, runs, and is wrong**. These skills load the right mental model and verified per-SDK templates so Claude generates correct Net code.
+Net looks like Kafka/NATS on the surface but has no broker. Net Payments looks like a payment SDK but never moves money. Out of the box, a coding agent will happily write Net code that **compiles, runs, and is wrong** — these skills load the right mental model and verified per-SDK templates instead.
 
-> **Heads up:** these are skills *about* Net — they do not install the Net library itself. Grab the SDK from [ai-2070/net](https://github.com/ai-2070/net).
+> These are skills *about* Net; they don't install Net itself. The SDK lives at [ai-2070/net](https://github.com/ai-2070/net).
 
----
-
-## Quick install (≈1 minute)
-
-A skill is just a directory containing a `SKILL.md`. Installing means dropping the skill folder(s) — `net-event-bus/` and/or `net-payments/` — where Claude Code looks for skills:
-
-- **Personal** → `~/.claude/skills/` — available in every project on your machine.
-- **Project** → `<your-repo>/.claude/skills/` — checked in and shared with your team.
-
-Install both, or just the one you need. Pick one of the methods below.
-
-### Option A — `npx skills` (recommended)
-
-The [`skills` CLI](https://github.com/vercel-labs/skills) installs a skill straight from this repo — no clone, no copy step:
-
-**Personal** — both skills, available in every project on your machine:
+## Install
 
 ```bash
 npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code -g
 ```
 
-**Project** — checked in for your whole team (run from the repo root):
+Installs both skills to `~/.claude/skills/`, available in every project. Drop `-g` to install into the current project's `.claude/skills/` instead — checked in and shared with your team.
+
+<details>
+<summary>Other options — one skill, other agents, manual install</summary>
+
+The [`skills` CLI](https://github.com/vercel-labs/skills) takes a few useful flags:
 
 ```bash
-npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code
+npx skills add ai-2070/net-claude-skill                            # interactive picker
+npx skills add ai-2070/net-claude-skill --skill net-payments -g    # just one skill
+npx skills add ai-2070/net-claude-skill --skill '*' -a '*' -g      # every agent, not just Claude Code
 ```
 
-Useful variations:
+These are plain Agent Skills, so `-a '*'` also installs them for Codex, Cursor, Copilot, and friends. The CLI symlinks each agent's skills directory to one canonical copy, so `npx skills update` refreshes them all (pass `--copy` if symlinks aren't an option).
 
-```bash
-npx skills add ai-2070/net-claude-skill --list              # see what's in the repo
-npx skills add ai-2070/net-claude-skill --skill net-payments -g   # just one
-npx skills add ai-2070/net-claude-skill                     # interactive picker
-npx skills add ai-2070/net-claude-skill --skill '*' -a '*'  # every agent, not just Claude Code
-```
+**Without the CLI:** a skill is just a directory containing a `SKILL.md`, so copying the folder in works too.
 
-Drop `--skill '*'` and the CLI asks which skills to install; drop `-a claude-code` and it asks which agents. It symlinks each agent's skills directory to one canonical copy by default (pass `--copy` if symlinks aren't an option), so `npx skills update` refreshes every install at once.
-
-These are plain Agent Skills, so `-a '*'` also installs them for Codex, Cursor, Copilot, and the rest of the CLI's supported agents.
-
-### Option B — Clone and copy by hand
-
-**macOS / Linux**
 ```bash
 git clone https://github.com/ai-2070/net-claude-skill.git /tmp/net-claude-skill
 mkdir -p ~/.claude/skills
 cp -R /tmp/net-claude-skill/net-event-bus /tmp/net-claude-skill/net-payments ~/.claude/skills/
 ```
 
-**Windows (PowerShell)**
-```powershell
-git clone https://github.com/ai-2070/net-claude-skill.git $env:TEMP\net-claude-skill
-New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\skills" | Out-Null
-Copy-Item -Recurse "$env:TEMP\net-claude-skill\net-event-bus" "$env:USERPROFILE\.claude\skills\"
-Copy-Item -Recurse "$env:TEMP\net-claude-skill\net-payments" "$env:USERPROFILE\.claude\skills\"
-```
+Use `<your-repo>/.claude/skills/` instead for a project install. To hack on the skills locally, clone once and symlink the folders so `git pull` updates them in place.
 
-You should end up with `~/.claude/skills/net-event-bus/SKILL.md` and `~/.claude/skills/net-payments/SKILL.md`. (Copying just one folder installs just that skill.) For a single project, copy into `<your-repo>/.claude/skills/` instead and commit it.
+</details>
 
-### Option C — Symlink a clone
+## Check it worked
 
-If you want to edit the skills locally, clone once and symlink so `git pull` updates the installed copies:
+Restart Claude Code and run `/skills` — **net-event-bus** and **net-payments** should be listed. Then just ask for something Net-shaped:
 
-```bash
-git clone https://github.com/ai-2070/net-claude-skill.git ~/src/net-claude-skill
-ln -s ~/src/net-claude-skill/net-event-bus ~/.claude/skills/net-event-bus
-ln -s ~/src/net-claude-skill/net-payments ~/.claude/skills/net-payments
-```
+> *"Wire up a Net publisher and subscriber over the mesh in TypeScript."*
+>
+> *"Price a Net capability with x402 and charge callers to invoke it."*
 
----
-
-## Verify it's installed
-
-1. Confirm they're installed:
-   ```bash
-   npx skills list                                                        # or, on disk:
-   ls ~/.claude/skills/net-event-bus/SKILL.md ~/.claude/skills/net-payments/SKILL.md
-   ```
-2. Start (or restart) Claude Code and run `/skills` — you should see **net-event-bus** and **net-payments** listed.
-3. Trigger one with a prompt that mentions Net, e.g.:
-   > *"Wire up a Net publisher and subscriber over the mesh in TypeScript."*
-   >
-   > *"Price a Net capability with x402 and charge callers to invoke it."*
-
-   Claude loads the matching skill automatically when your request matches — **net-event-bus** on imports of `@net-mesh/sdk` / `net-sdk` or phrases like *pub/sub with Net*, *nRPC*, *mesh RPC*, *RedEX*, *CortEX*, *Dataforts*, *gang scheduler*, *claim an island*, *net wrap / mcp serve*, *org capability*, *serve_org*, *tenant-private service*, *A2A*, *hand off a task to another agent*, *delegated identity*, *enroll a device*; **net-payments** on imports of `net-payments` / `net_payments` or phrases like *price a capability*, *pay to invoke*, *x402*, *settle on Base/Solana/XRPL*, *spend limit*, …
-
----
+Claude loads the matching skill on its own — you never have to name it.
 
 ## What's inside
 
-Both skills are progressive-disclosure: `SKILL.md` is the always-on entry point, and the reference files are loaded on demand.
+Each skill is a `SKILL.md` entry point plus reference files that Claude loads **only when the task needs them**, so idle cost is one routing table rather than the whole manual.
 
-### `net-event-bus/`
+<details>
+<summary><b><code>net-event-bus/</code></b> — full file map</summary>
 
 | File | Loaded when |
 |---|---|
@@ -131,7 +87,10 @@ Both skills are progressive-disclosure: `SKILL.md` is the always-on entry point,
 | `event-semantics.md` | Naming events / what an event may assert — a fact observed at one layer, not an end-to-end `200 OK`. |
 | `examples/` | Minimal runnable hello-world per SDK (TS, Py, Rust, Go, C). |
 
-### `net-payments/`
+</details>
+
+<details>
+<summary><b><code>net-payments/</code></b> — full file map</summary>
 
 | File | Loaded when |
 |---|---|
@@ -153,53 +112,23 @@ Both skills are progressive-disclosure: `SKILL.md` is the always-on entry point,
 | `testing.md` | Cross-language golden vectors, the mock conformance suite, the key-invariant negative test, the env-gated live run. |
 | `gotchas.md` | Wrong mental model, migrating, or before merging — the review invariant, "what not to build," byte-preservation traps. |
 
----
+</details>
 
-## Updating
-
-- **`npx skills` (Option A):**
-  ```bash
-  npx skills update -g          # global installs
-  npx skills update -p          # project installs
-  npx skills update net-event-bus   # just one
-  ```
-- **Cloned/copied (Option B):** re-run the copy step, or `git pull` in the clone and copy again.
-- **Symlinked (Option C):** `git pull` in `~/src/net-claude-skill` — the installed skills track it automatically.
-
-## Uninstall
+## Update / uninstall
 
 ```bash
-npx skills remove net-event-bus net-payments -g   # personal
-npx skills remove net-event-bus net-payments      # project
+npx skills update -g                               # refresh to the latest
+npx skills remove net-event-bus net-payments -g    # uninstall
 ```
 
-Or delete the directories directly:
-
-```bash
-rm -rf ~/.claude/skills/net-event-bus ~/.claude/skills/net-payments   # personal
-rm -rf .claude/skills/net-event-bus .claude/skills/net-payments       # project
-```
-
----
+Drop `-g` for project installs. If you installed by hand, `rm -rf ~/.claude/skills/net-event-bus ~/.claude/skills/net-payments`.
 
 ## Links
 
 - **Net library & SDKs:** https://github.com/ai-2070/net
-- **Net documentation:** https://ai2070.net/docs — start with [What is Net?](https://ai2070.net/docs/start/what-is-net)
-- **Claude Code skills docs:** https://docs.anthropic.com/en/docs/claude-code/skills
-- **`skills` CLI (`npx skills`):** https://github.com/vercel-labs/skills
+- **Net docs:** https://ai2070.net/docs — start with [What is Net?](https://ai2070.net/docs/start/what-is-net)
+- **Agent Skills:** https://docs.anthropic.com/en/docs/claude-code/skills · **`skills` CLI:** https://github.com/vercel-labs/skills
 
 ## License
 
-Licensed under either of
-
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
-
-at your option.
-
-### Contribution
-
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in this work by you, as defined in the Apache-2.0 license, shall
-be dual licensed as above, without any additional terms or conditions.
+Dual-licensed under [Apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT), at your option. Contributions are dual-licensed the same way unless you say otherwise.
