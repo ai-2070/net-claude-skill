@@ -131,4 +131,4 @@ Drop `-g` for project installs. If you installed by hand, `rm -rf ~/.claude/skil
 
 ## License
 
-Dual-licensed under [Apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT), at your option. Contributions are dual-licensed the same way unless you say otherwise.
+Dual-licensed under [Apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT), at your option.
