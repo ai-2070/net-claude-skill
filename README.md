@@ -20,7 +20,32 @@ A skill is just a directory containing a `SKILL.md`. Installing means dropping t
 
 Install both, or just the one you need. Pick one of the methods below.
 
-### Option A — Clone straight into your skills directory (recommended)
+### Option A — `npx skills` (recommended)
+
+The [`skills` CLI](https://github.com/vercel-labs/skills) installs a skill straight from this repo — no clone, no copy step:
+
+```bash
+# Personal — both skills, available in every project on your machine
+npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code -g
+
+# Project — checked in for your whole team (run from the repo root)
+npx skills add ai-2070/net-claude-skill --skill '*' -a claude-code
+```
+
+Useful variations:
+
+```bash
+npx skills add ai-2070/net-claude-skill --list              # see what's in the repo
+npx skills add ai-2070/net-claude-skill --skill net-payments -g   # just one
+npx skills add ai-2070/net-claude-skill                     # interactive picker
+npx skills add ai-2070/net-claude-skill --skill '*' -a '*'  # every agent, not just Claude Code
+```
+
+Drop `--skill '*'` and the CLI asks which skills to install; drop `-a claude-code` and it asks which agents. It symlinks each agent's skills directory to one canonical copy by default (pass `--copy` if symlinks aren't an option), so `npx skills update` refreshes every install at once.
+
+These are plain Agent Skills, so `-a '*'` also installs them for Codex, Cursor, Copilot, and the rest of the CLI's supported agents.
+
+### Option B — Clone and copy by hand
 
 **macOS / Linux**
 ```bash
@@ -37,22 +62,11 @@ Copy-Item -Recurse "$env:TEMP\net-claude-skill\net-event-bus" "$env:USERPROFILE\
 Copy-Item -Recurse "$env:TEMP\net-claude-skill\net-payments" "$env:USERPROFILE\.claude\skills\"
 ```
 
-You should end up with `~/.claude/skills/net-event-bus/SKILL.md` and `~/.claude/skills/net-payments/SKILL.md`. (Copying just one folder installs just that skill.)
+You should end up with `~/.claude/skills/net-event-bus/SKILL.md` and `~/.claude/skills/net-payments/SKILL.md`. (Copying just one folder installs just that skill.) For a single project, copy into `<your-repo>/.claude/skills/` instead and commit it.
 
-### Option B — Install into a single project
+### Option C — Symlink a clone
 
-From the root of the repo where you want the skills available to your whole team:
-
-```bash
-mkdir -p .claude/skills
-git clone https://github.com/ai-2070/net-claude-skill.git /tmp/net-claude-skill
-cp -R /tmp/net-claude-skill/net-event-bus /tmp/net-claude-skill/net-payments .claude/skills/
-git add .claude/skills/net-event-bus .claude/skills/net-payments && git commit -m "Add Net Claude skills"
-```
-
-### Option C — Symlink to stay up to date
-
-Clone once, then symlink so `git pull` updates the installed skills:
+If you want to edit the skills locally, clone once and symlink so `git pull` updates the installed copies:
 
 ```bash
 git clone https://github.com/ai-2070/net-claude-skill.git ~/src/net-claude-skill
@@ -64,8 +78,9 @@ ln -s ~/src/net-claude-skill/net-payments ~/.claude/skills/net-payments
 
 ## Verify it's installed
 
-1. Confirm the files are on disk:
+1. Confirm they're installed:
    ```bash
+   npx skills list                                                        # or, on disk:
    ls ~/.claude/skills/net-event-bus/SKILL.md ~/.claude/skills/net-payments/SKILL.md
    ```
 2. Start (or restart) Claude Code and run `/skills` — you should see **net-event-bus** and **net-payments** listed.
@@ -138,10 +153,23 @@ Both skills are progressive-disclosure: `SKILL.md` is the always-on entry point,
 
 ## Updating
 
-- **Cloned/copied (Options A & B):** re-run the copy step, or `git pull` in the clone and copy again.
+- **`npx skills` (Option A):**
+  ```bash
+  npx skills update -g          # global installs
+  npx skills update -p          # project installs
+  npx skills update net-event-bus   # just one
+  ```
+- **Cloned/copied (Option B):** re-run the copy step, or `git pull` in the clone and copy again.
 - **Symlinked (Option C):** `git pull` in `~/src/net-claude-skill` — the installed skills track it automatically.
 
 ## Uninstall
+
+```bash
+npx skills remove net-event-bus net-payments -g   # personal
+npx skills remove net-event-bus net-payments      # project
+```
+
+Or delete the directories directly:
 
 ```bash
 rm -rf ~/.claude/skills/net-event-bus ~/.claude/skills/net-payments   # personal
@@ -155,6 +183,7 @@ rm -rf .claude/skills/net-event-bus .claude/skills/net-payments       # project
 - **Net library & SDKs:** https://github.com/ai-2070/net
 - **Net documentation:** https://ai2070.net/docs — start with [What is Net?](https://ai2070.net/docs/start/what-is-net)
 - **Claude Code skills docs:** https://docs.anthropic.com/en/docs/claude-code/skills
+- **`skills` CLI (`npx skills`):** https://github.com/vercel-labs/skills
 
 ## License
 
